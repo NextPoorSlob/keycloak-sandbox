@@ -1,0 +1,37 @@
+name: keycloak-dev-local
+services:
+  database:
+    image: postgres:${POSTGRES_VERSION:-17-alpine}
+    container_name: database
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-keycloak}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_PORT_EXTERNAL:-5432}:5432"
+    volumes:
+      - database-data:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION:-26.8}
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_DB: postgres
+      KC_DB_URL_HOST: database
+      KC_DB_URL_DATABASE: ${POSTGRES_DB:-keycloak}
+      KC_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${KEYCLOAK_PORT_EXTERNAL:-8180}:8080"
+    depends_on:
+      - database
+    command:
+      - start-dev
+volumes:
+    database-data:
+
+networks:
+    default:
+        name: keycloak-network
