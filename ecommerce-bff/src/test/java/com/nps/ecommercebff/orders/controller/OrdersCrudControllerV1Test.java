@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,12 +33,11 @@ class OrdersCrudControllerV1Test {
     @Autowired
     private MockMvc mockMvc;
 
+    @SuppressWarnings("SameParameterValue")
     private static @NonNull List<OrderRequest> buildOrderRequests(int count) {
-
         List<OrderRequest> orderRequests = new ArrayList<>();
-        BigDecimal price = BigDecimal.valueOf(9.99);
         for (int i = 0; i < count; i++) {
-            price = price.add(BigDecimal.valueOf(10.00));
+            double price = (1999 + i * 1000) / 100.0;
             orderRequests.add(new OrderRequest(
                     "order-" + (i + 1),
                     "customer-" + (i + 1),
@@ -49,20 +47,12 @@ class OrdersCrudControllerV1Test {
         return orderRequests;
     }
 
-    private static OrderRequest buildOrderRequest() {
-        return new OrderRequest(
-                "order-1",
-                "customer-1",
-                List.of(new OrderItem("product-1", 2, BigDecimal.valueOf(19.99)))
-        );
-    }
-
     private static String orderRequestJson() {
         return """
                 {
                   "orderId": "order-1",
                   "customerId": "customer-1",
-                  "items": [{"productId": "product-1", "quantity": 2, "price": 19.99}]
+                  "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                 }
                 """;
     }
@@ -73,7 +63,14 @@ class OrdersCrudControllerV1Test {
 
         mockMvc.perform(get("/api/v1/orders"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
+                .andExpect(content().json("""
+                        {
+                          "status": "success",
+                          "httpStatus": 200,
+                          "message": "0 Orders returned successfully",
+                          "data": []
+                        }
+                        """));
     }
 
     @Test
@@ -83,28 +80,44 @@ class OrdersCrudControllerV1Test {
         mockMvc.perform(get("/api/v1/orders"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
-                        [
-                          {
-                            "orderId": "order-1",
-                            "customerId": "customer-1",
-                            "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
-                          },
-                          {
-                            "orderId": "order-2",
-                            "customerId": "customer-2",
-                            "items": [{"productId": "product-2", "quantity": 2, "price": 29.99}]
-                          }
-                        ]
+                        {
+                          "status": "success",
+                          "httpStatus": 200,
+                          "message": "2 Orders returned successfully",
+                          "data": [
+                            {
+                              "orderId": "order-1",
+                              "customerId": "customer-1",
+                              "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
+                            },
+                            {
+                              "orderId": "order-2",
+                              "customerId": "customer-2",
+                              "items": [{"productId": "product-2", "quantity": 2, "price": 29.99}]
+                            }
+                          ]
+                        }
                         """));
     }
 
     @Test
     void getOrder_returnsOrderWhenFound() throws Exception {
-        when(orderCrudService.getOrderById("order-1")).thenReturn(Optional.of(buildOrderRequest()));
+        when(orderCrudService.getOrderById("order-1")).thenReturn(Optional.of(buildOrderRequests(1).getFirst()));
 
         mockMvc.perform(get("/api/v1/orders/order-1"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(orderRequestJson()));
+                .andExpect(content().json("""
+                        {
+                          "status": "success",
+                          "httpStatus": 200,
+                          "message": "Order returned successfully",
+                          "data": {
+                            "orderId": "order-1",
+                            "customerId": "customer-1",
+                            "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
+                          }
+                        }
+                        """));
     }
 
     @Test
@@ -112,36 +125,60 @@ class OrdersCrudControllerV1Test {
         when(orderCrudService.getOrderById("missing-order")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/v1/orders/missing-order"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(content().json("""
+                        {
+                          "status": "error",
+                          "httpStatus": 404,
+                          "message": "Order [missing-order] not found.",
+                          "data": null
+                        }
+                        """));
     }
 
     @Test
     void createOrder_returnsCreatedOrder() throws Exception {
-        when(orderCrudService.createOrder(buildOrderRequest())).thenReturn(buildOrderRequest());
+        OrderRequest expectedOrder = buildOrderRequests(1).getFirst();
+        when(orderCrudService.createOrder(expectedOrder)).thenReturn(expectedOrder);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderRequestJson()))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
-                .andExpect(content().json(orderRequestJson()));
+                .andExpect(content().json("""
+                        {
+                          "status": "success",
+                          "httpStatus": 201,
+                          "message": "Order order-1 created successfully",
+                          "data": "order-1"
+                        }
+                        """));
     }
 
     @Test
     void updateOrder_returnsUpdatedOrderWhenFound() throws Exception {
-        when(orderCrudService.updateOrder("order-1", buildOrderRequest()))
-                .thenReturn(Optional.of(buildOrderRequest()));
+        OrderRequest expectedOrder = buildOrderRequests(1).getFirst();
+        when(orderCrudService.updateOrder("order-1", expectedOrder))
+                .thenReturn(Optional.of(expectedOrder));
 
         mockMvc.perform(put("/api/v1/orders/order-1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderRequestJson()))
                 .andExpect(status().isOk())
-                .andExpect(content().json(orderRequestJson()));
+                .andExpect(content().json("""
+                        {
+                          "status": "success",
+                          "httpStatus": 200,
+                          "message": "Order order-1 updated successfully",
+                          "data": null
+                        }
+                        """));
     }
 
     @Test
     void updateOrder_returnsNotFoundWhenOrderDoesNotExist() throws Exception {
-        when(orderCrudService.updateOrder("missing-order", buildOrderRequest()))
+        when(orderCrudService.updateOrder("missing-order", buildOrderRequests(1).getFirst()))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(put("/api/v1/orders/missing-order")
@@ -155,7 +192,15 @@ class OrdersCrudControllerV1Test {
         when(orderCrudService.deleteOrder("order-1")).thenReturn(true);
 
         mockMvc.perform(delete("/api/v1/orders/order-1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                        {
+                          "status": "success",
+                          "httpStatus": 200,
+                          "message": "Order order-1 deleted successfully",
+                          "data": null
+                        }
+                        """));
     }
 
     @Test
