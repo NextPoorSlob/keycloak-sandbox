@@ -1,6 +1,6 @@
 package com.nps.ecommercebff.orders.controller;
 
-import com.nps.ecommercebff.orders.model.OrderItem;
+import com.nps.ecommercebff.orders.model.OrderItemRequest;
 import com.nps.ecommercebff.orders.model.OrderRequest;
 import com.nps.ecommercebff.orders.service.OrderCrudService;
 import org.jspecify.annotations.NonNull;
@@ -41,7 +41,7 @@ class OrdersCrudControllerV1Test {
             orderRequests.add(new OrderRequest(
                     "order-" + (i + 1),
                     "customer-" + (i + 1),
-                    List.of(new OrderItem("product-" + (i + 1), i + 1, price))
+                    List.of(new OrderItemRequest("product-" + (i + 1), i + 1, price))
             ));
         }
         return orderRequests;
@@ -64,12 +64,7 @@ class OrdersCrudControllerV1Test {
         mockMvc.perform(get("/api/v1/orders"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
-                        {
-                          "status": "success",
-                          "httpStatus": 200,
-                          "message": "0 Orders returned successfully",
-                          "data": []
-                        }
+                        []
                         """));
     }
 
@@ -80,23 +75,18 @@ class OrdersCrudControllerV1Test {
         mockMvc.perform(get("/api/v1/orders"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
-                        {
-                          "status": "success",
-                          "httpStatus": 200,
-                          "message": "2 Orders returned successfully",
-                          "data": [
-                            {
-                              "orderId": "order-1",
-                              "customerId": "customer-1",
-                              "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
-                            },
-                            {
-                              "orderId": "order-2",
-                              "customerId": "customer-2",
-                              "items": [{"productId": "product-2", "quantity": 2, "price": 29.99}]
-                            }
-                          ]
-                        }
+                        [
+                          {
+                            "orderId": "order-1",
+                            "customerId": "customer-1",
+                            "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
+                          },
+                          {
+                            "orderId": "order-2",
+                            "customerId": "customer-2",
+                            "items": [{"productId": "product-2", "quantity": 2, "price": 29.99}]
+                          }
+                        ]
                         """));
     }
 
@@ -108,14 +98,9 @@ class OrdersCrudControllerV1Test {
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
                         {
-                          "status": "success",
-                          "httpStatus": 200,
-                          "message": "Order returned successfully",
-                          "data": {
-                            "orderId": "order-1",
-                            "customerId": "customer-1",
-                            "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
-                          }
+                          "orderId": "order-1",
+                          "customerId": "customer-1",
+                          "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                         }
                         """));
     }
@@ -148,10 +133,9 @@ class OrdersCrudControllerV1Test {
                 .andExpect(header().exists("Location"))
                 .andExpect(content().json("""
                         {
-                          "status": "success",
-                          "httpStatus": 201,
-                          "message": "Order order-1 created successfully",
-                          "data": "order-1"
+                          "orderId": "order-1",
+                          "customerId": "customer-1",
+                          "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                         }
                         """));
     }
@@ -165,15 +149,8 @@ class OrdersCrudControllerV1Test {
         mockMvc.perform(put("/api/v1/orders/order-1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderRequestJson()))
-                .andExpect(status().isOk())
-                .andExpect(content().json("""
-                        {
-                          "status": "success",
-                          "httpStatus": 200,
-                          "message": "Order order-1 updated successfully",
-                          "data": null
-                        }
-                        """));
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
     }
 
     @Test
@@ -192,15 +169,8 @@ class OrdersCrudControllerV1Test {
         when(orderCrudService.deleteOrder("order-1")).thenReturn(true);
 
         mockMvc.perform(delete("/api/v1/orders/order-1"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("""
-                        {
-                          "status": "success",
-                          "httpStatus": 200,
-                          "message": "Order order-1 deleted successfully",
-                          "data": null
-                        }
-                        """));
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
     }
 
     @Test

@@ -1,6 +1,6 @@
 package com.nps.ecommercebff.orders.service;
 
-import com.nps.ecommercebff.orders.model.OrderItem;
+import com.nps.ecommercebff.orders.model.OrderItemRequest;
 import com.nps.ecommercebff.orders.model.OrderRequest;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class OrderService implements OrderCrudService{
             return Optional.of(new OrderRequest(
                     "order-1",
                     "customer-1",
-                    List.of(new OrderItem("product-1", 1, 19.99))
+                    List.of(new OrderItemRequest("product-1", 1, 19.99))
             ));
         }
         return Optional.empty();
@@ -38,6 +38,9 @@ public class OrderService implements OrderCrudService{
 
     @Override
     public Optional<OrderRequest> updateOrder(String orderId, OrderRequest order) {
+        if (!"order-1".equals(orderId)) {
+            return Optional.empty();
+        }
         return Optional.of(order);
     }
 
@@ -53,7 +56,7 @@ public class OrderService implements OrderCrudService{
             orderRequests.add(new OrderRequest(
                     "order-" + (i + 1),
                     "customer-" + (i + 1),
-                    List.of(new OrderItem("product-" + (i + 1), i + 1, price))
+                    List.of(new OrderItemRequest("product-" + (i + 1), i + 1, price))
             ));
         }
         return orderRequests;

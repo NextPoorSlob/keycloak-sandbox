@@ -9,5 +9,5 @@ public record OrderRequest(
 
         String orderId,
         String customerId,
-        List<OrderItem> items
+        List<OrderItemRequest> items
 ) {}
