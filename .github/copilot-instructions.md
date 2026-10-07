@@ -35,17 +35,17 @@ This repository is a small integration sandbox rather than a single-service app:
 Within `ecommerce-bff`, the app follows a conventional Spring MVC layout:
 
 - `src/main/java/com/nps/ecommercebff/EcommerceBffApplication.java` boots the application.
-- `orders/` contains the order feature: `controller/`, `service/`, and `model/`.
+- `orders/` and `products/` contain the order and product features, each organized into `controller/`, `service/`, and `model/`.
 - `common/` contains reusable API response and error-handling pieces.
 - `src/main/resources/application.properties` contains the app configuration.
 
-The order API uses standard REST representations and status codes: GET endpoints return order data directly with `200 OK`, POST returns the created order with `201 Created` and a `Location` header, and successful PUT/DELETE operations return `204 No Content`. The shared `GlobalExceptionHandler` converts `ResourceNotFoundException` into a JSON envelope shaped like `{ status, httpStatus, message, data }`; error responses therefore use this envelope while successful CRUD responses do not.
+The order and product APIs use standard REST representations and status codes: GET endpoints return resource data directly with `200 OK`, POST returns the created resource with `201 Created` and a `Location` header, and successful PUT/DELETE operations return `204 No Content`. Orders are addressed by `orderId` in the route while their request record exposes `orderName`; products are addressed by their `name` because `ProductRequest` has no separate ID field. The shared `GlobalExceptionHandler` converts `ResourceNotFoundException` into a JSON envelope shaped like `{ status, httpStatus, message, data }`; error responses therefore use this envelope while successful CRUD responses do not.
 
 ## Key conventions
 
-- The project uses Java records for request/response DTOs instead of verbose POJO classes (`OrderRequest`, `OrderItemRequest`, `ApiResponseBody`).
-- Service boundaries are explicit: controllers depend on `OrderCrudService`, while `OrderService` implements that interface. This keeps controllers thin and makes tests easier to mock.
-- Controllers are organized by versioned endpoints (`/api/v1/orders`) and use Spring MVC annotations plus OpenAPI annotations (`@Operation`, `@ApiResponse`, etc.).
+- The project uses Java records for request/response DTOs instead of verbose POJO classes (`OrderRequest`, `OrderItemRequest`, `ApiResponseBody`). `OrderRequest` exposes the order's name as `orderName`; keep this property name consistent in Java and JSON.
+- Service boundaries are explicit: controllers depend on `OrderCrudService` or `ProductCrudService`, while `OrderService` and `ProductService` implement those interfaces. This keeps controllers thin and makes tests easier to mock.
+- Controllers are organized by versioned endpoints (`/api/v1/orders` and `/api/v1/products`) and use Spring MVC annotations plus OpenAPI annotations (`@Operation`, `@ApiResponse`, etc.).
 - Tests are close to the controller logic and use `@WebMvcTest` with `MockMvc` and `@MockitoBean` to validate endpoint behavior and response payloads.
 - This app targets Java 25 via the Gradle toolchain (`languageVersion = JavaLanguageVersion.of(25)`), and it uses Spring Boot 4.1.1 with Spring MVC.
 
