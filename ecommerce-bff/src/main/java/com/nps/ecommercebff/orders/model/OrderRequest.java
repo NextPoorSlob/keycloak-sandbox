@@ -7,7 +7,7 @@ import java.util.List;
  */
 public record OrderRequest(
 
-        String orderId,
+        String orderName,
         String customerId,
         List<OrderItemRequest> items
 ) {}

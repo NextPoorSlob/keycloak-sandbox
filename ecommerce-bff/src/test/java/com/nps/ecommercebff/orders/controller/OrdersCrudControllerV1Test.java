@@ -50,7 +50,7 @@ class OrdersCrudControllerV1Test {
     private static String orderRequestJson() {
         return """
                 {
-                  "orderId": "order-1",
+                  "orderName": "order-1",
                   "customerId": "customer-1",
                   "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                 }
@@ -77,12 +77,12 @@ class OrdersCrudControllerV1Test {
                 .andExpect(content().json("""
                         [
                           {
-                            "orderId": "order-1",
+                            "orderName": "order-1",
                             "customerId": "customer-1",
                             "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                           },
                           {
-                            "orderId": "order-2",
+                            "orderName": "order-2",
                             "customerId": "customer-2",
                             "items": [{"productId": "product-2", "quantity": 2, "price": 29.99}]
                           }
@@ -98,7 +98,7 @@ class OrdersCrudControllerV1Test {
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
                         {
-                          "orderId": "order-1",
+                          "orderName": "order-1",
                           "customerId": "customer-1",
                           "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                         }
@@ -133,7 +133,7 @@ class OrdersCrudControllerV1Test {
                 .andExpect(header().exists("Location"))
                 .andExpect(content().json("""
                         {
-                          "orderId": "order-1",
+                          "orderName": "order-1",
                           "customerId": "customer-1",
                           "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                         }

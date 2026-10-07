@@ -5,6 +5,9 @@ import com.nps.ecommercebff.orders.model.OrderRequest;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Defines the contract for performing CRUD operations on orders in the e-commerce application.
+ */
 public interface OrderCrudService {
     /**
      * Retrieves a list of all orders in the e-commerce application.

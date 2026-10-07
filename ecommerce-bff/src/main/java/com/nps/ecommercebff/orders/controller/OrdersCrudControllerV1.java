@@ -81,7 +81,7 @@ public class OrdersCrudControllerV1 {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{orderId}")
                 .buildAndExpand(
-                        createdOrder.orderId())
+                        createdOrder.orderName())
                 .toUri();
         return ResponseEntity.created(location).body(createdOrder);
     }
@@ -89,7 +89,7 @@ public class OrdersCrudControllerV1 {
     /**
      * Updates the existing order.
      *
-     * @param orderId the ID of the order to update. This has to match the orderId in the order data.
+     * @param orderId the ID of the order to update. This has to match the orderName in the order data.
      * @param order   the complete order data for the order to update.
      * @return a no-content response when the order is updated.
      */
