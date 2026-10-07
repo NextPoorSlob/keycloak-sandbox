@@ -16,15 +16,15 @@ import java.util.Optional;
 public class OrderService implements OrderCrudService{
     @Override
     public List<OrderRequest> getOrders() {
-        return buildOrderRequests(5);
+        return buildOrderRequests();
     }
 
     @Override
-    public Optional<OrderRequest> getOrderById(String orderId) {
-        if ("order-1".equals(orderId)) {
+    public Optional<OrderRequest> getOrderByName(String orderName) {
+        if ("order-1".equals(orderName)) {
             return Optional.of(new OrderRequest(
                     "order-1",
-                    "customer-1",
+                    1,
                     List.of(new OrderItemRequest("product-1", 1, 19.99))
             ));
         }
@@ -37,25 +37,25 @@ public class OrderService implements OrderCrudService{
     }
 
     @Override
-    public Optional<OrderRequest> updateOrder(String orderId, OrderRequest order) {
-        if (!"order-1".equals(orderId)) {
+    public Optional<OrderRequest> updateOrder(String orderName, OrderRequest order) {
+        if (!"order-1".equals(orderName)) {
             return Optional.empty();
         }
         return Optional.of(order);
     }
 
     @Override
-    public boolean deleteOrder(String orderId) {
-        return "order-1".equals(orderId);
+    public boolean deleteOrder(String orderName) {
+        return "order-1".equals(orderName);
     }
 
-    private static @NonNull List<OrderRequest> buildOrderRequests(int count) {
+    private static @NonNull List<OrderRequest> buildOrderRequests() {
         List<OrderRequest> orderRequests = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < 5; i++) {
             double price = (1999 + i * 1000) / 100.0;
             orderRequests.add(new OrderRequest(
                     "order-" + (i + 1),
-                    "customer-" + (i + 1),
+                    i + 1,
                     List.of(new OrderItemRequest("product-" + (i + 1), i + 1, price))
             ));
         }

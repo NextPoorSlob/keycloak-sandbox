@@ -40,7 +40,7 @@ class OrdersCrudControllerV1Test {
             double price = (1999 + i * 1000) / 100.0;
             orderRequests.add(new OrderRequest(
                     "order-" + (i + 1),
-                    "customer-" + (i + 1),
+                    i + 1,
                     List.of(new OrderItemRequest("product-" + (i + 1), i + 1, price))
             ));
         }
@@ -51,7 +51,7 @@ class OrdersCrudControllerV1Test {
         return """
                 {
                   "orderName": "order-1",
-                  "customerId": "customer-1",
+                  "customerId": 1,
                   "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                 }
                 """;
@@ -78,12 +78,12 @@ class OrdersCrudControllerV1Test {
                         [
                           {
                             "orderName": "order-1",
-                            "customerId": "customer-1",
+                            "customerId": 1,
                             "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                           },
                           {
                             "orderName": "order-2",
-                            "customerId": "customer-2",
+                            "customerId": 2,
                             "items": [{"productId": "product-2", "quantity": 2, "price": 29.99}]
                           }
                         ]
@@ -92,14 +92,14 @@ class OrdersCrudControllerV1Test {
 
     @Test
     void getOrder_returnsOrderWhenFound() throws Exception {
-        when(orderCrudService.getOrderById("order-1")).thenReturn(Optional.of(buildOrderRequests(1).getFirst()));
+        when(orderCrudService.getOrderByName("order-1")).thenReturn(Optional.of(buildOrderRequests(1).getFirst()));
 
         mockMvc.perform(get("/api/v1/orders/order-1"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
                         {
                           "orderName": "order-1",
-                          "customerId": "customer-1",
+                          "customerId": 1,
                           "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                         }
                         """));
@@ -107,7 +107,7 @@ class OrdersCrudControllerV1Test {
 
     @Test
     void getOrder_returnsNotFoundWhenOrderDoesNotExist() throws Exception {
-        when(orderCrudService.getOrderById("missing-order")).thenReturn(Optional.empty());
+        when(orderCrudService.getOrderByName("missing-order")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/v1/orders/missing-order"))
                 .andExpect(status().isNotFound())
@@ -134,7 +134,7 @@ class OrdersCrudControllerV1Test {
                 .andExpect(content().json("""
                         {
                           "orderName": "order-1",
-                          "customerId": "customer-1",
+                          "customerId": 1,
                           "items": [{"productId": "product-1", "quantity": 1, "price": 19.99}]
                         }
                         """));

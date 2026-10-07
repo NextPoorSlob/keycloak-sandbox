@@ -45,22 +45,22 @@ public class OrdersCrudControllerV1 {
     /**
      * Returns the requested order.
      *
-     * @param orderId the ID of order to return.
-     * @return the order specified by the ID.
+     * @param orderName the name of order to return.
+     * @return the order specified by the name.
      */
-    @GetMapping("/{orderId}")
-    @Operation(summary = "Get an order", description = "Returns an order by its ID.")
+    @GetMapping("/{orderName}")
+    @Operation(summary = "Get an order", description = "Returns an order by its name.")
     @SuppressWarnings("squid:S1710")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Order returned successfully"),
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content)
     })
     public ResponseEntity<OrderRequest> getOrder(
-            @Parameter(description = "ID of the order to retrieve", required = true)
-            @PathVariable String orderId) {
-        return orderService.getOrderById(orderId)
+            @Parameter(description = "Name of the order to retrieve", required = true)
+            @PathVariable String orderName) {
+        return orderService.getOrderByName(orderName)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ORDER_NOT_FOUND, orderId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ORDER_NOT_FOUND, orderName)));
     }
 
     /**
@@ -79,7 +79,7 @@ public class OrdersCrudControllerV1 {
     public ResponseEntity<OrderRequest> createOrder(@RequestBody OrderRequest order) {
         OrderRequest createdOrder = orderService.createOrder(order);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{orderId}")
+                .path("/{orderName}")
                 .buildAndExpand(
                         createdOrder.orderName())
                 .toUri();
@@ -89,12 +89,12 @@ public class OrdersCrudControllerV1 {
     /**
      * Updates the existing order.
      *
-     * @param orderId the ID of the order to update. This has to match the orderName in the order data.
+     * @param orderName the name of the order to update. This has to match the orderName in the order data.
      * @param order   the complete order data for the order to update.
      * @return a no-content response when the order is updated.
      */
-    @PutMapping("/{orderId}")
-    @Operation(summary = "Update an order", description = "Replaces an existing order by its ID.")
+    @PutMapping("/{orderName}")
+    @Operation(summary = "Update an order", description = "Replaces an existing order by its name.")
     @SuppressWarnings("squid:S1710")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Order updated successfully", content = @Content),
@@ -102,32 +102,32 @@ public class OrdersCrudControllerV1 {
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content)
     })
     public ResponseEntity<Void> updateOrder(
-            @Parameter(description = "ID of the order to update", required = true)
-            @PathVariable String orderId,
+            @Parameter(description = "Name of the order to update", required = true)
+            @PathVariable String orderName,
             @RequestBody OrderRequest order) {
-        orderService.updateOrder(orderId, order)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ORDER_NOT_FOUND, orderId)));
+        orderService.updateOrder(orderName, order)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ORDER_NOT_FOUND, orderName)));
         return ResponseEntity.noContent().build();
     }
 
     /**
      * Deletes the specified order.
      *
-     * @param orderId the ID of the order to delete.
+     * @param orderName the name of the order to delete.
      * @return a no-content response when the order is deleted.
      */
-    @DeleteMapping("/{orderId}")
-    @Operation(summary = "Delete an order", description = "Deletes an order by its ID.")
+    @DeleteMapping("/{orderName}")
+    @Operation(summary = "Delete an order", description = "Deletes an order by its name.")
     @SuppressWarnings("squid:S1710")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Order deleted successfully", content = @Content),
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content)
     })
     public ResponseEntity<Void> deleteOrder(
-            @Parameter(description = "ID of the order to delete", required = true)
-            @PathVariable String orderId) {
-        if (!orderService.deleteOrder(orderId)) {
-            throw new ResourceNotFoundException(String.format(ORDER_NOT_FOUND, orderId));
+            @Parameter(description = "Name of the order to delete", required = true)
+            @PathVariable String orderName) {
+        if (!orderService.deleteOrder(orderName)) {
+            throw new ResourceNotFoundException(String.format(ORDER_NOT_FOUND, orderName));
         }
         return ResponseEntity.noContent().build();
     }

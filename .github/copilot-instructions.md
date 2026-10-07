@@ -43,7 +43,7 @@ The order and product APIs use standard REST representations and status codes: G
 
 ## Key conventions
 
-- The project uses Java records for request/response DTOs instead of verbose POJO classes (`OrderRequest`, `OrderItemRequest`, `ApiResponseBody`). `OrderRequest` exposes the order's name as `orderName`; keep this property name consistent in Java and JSON.
+- The project uses Java records for request/response DTOs instead of verbose POJO classes (`OrderRequest`, `OrderItemRequest`, `ApiResponseBody`). `OrderRequest` exposes the order's name as `orderName` and its `customerId` as an `Integer`; keep these property names and types consistent in Java and JSON.
 - Service boundaries are explicit: controllers depend on `OrderCrudService` or `ProductCrudService`, while `OrderService` and `ProductService` implement those interfaces. This keeps controllers thin and makes tests easier to mock.
 - Controllers are organized by versioned endpoints (`/api/v1/orders` and `/api/v1/products`) and use Spring MVC annotations plus OpenAPI annotations (`@Operation`, `@ApiResponse`, etc.).
 - Tests are close to the controller logic and use `@WebMvcTest` with `MockMvc` and `@MockitoBean` to validate endpoint behavior and response payloads.
