@@ -5,6 +5,9 @@ import com.nps.ecommercebff.orders.model.OrderRequest;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Defines the contract for performing CRUD operations on orders in the e-commerce application.
+ */
 public interface OrderCrudService {
     /**
      * Retrieves a list of all orders in the e-commerce application.
@@ -13,11 +16,11 @@ public interface OrderCrudService {
     List<OrderRequest> getOrders();
 
     /**
-     * Retrieves an order by its unique identifier.
-     * @param orderId The unique identifier of the order.
+     * Retrieves an order by its unique name.
+     * @param orderName The unique name of the order.
      * @return An Optional containing the OrderRequest if found, or empty if not found.
      */
-    Optional<OrderRequest> getOrderById(String orderId);
+    Optional<OrderRequest> getOrderByName(String orderName);
 
     /**
      * Creates a new order in the e-commerce application.
@@ -28,16 +31,16 @@ public interface OrderCrudService {
 
     /**
      * Updates an existing order in the e-commerce application.
-     * @param orderId The unique identifier of the order to be updated.
+     * @param orderName The unique name of the order to be updated.
      * @param order The OrderRequest object containing the updated order details.
      * @return An Optional containing the updated OrderRequest if the update was successful, or empty if the order was not found.
      */
-    Optional<OrderRequest> updateOrder(String orderId, OrderRequest order);
+    Optional<OrderRequest> updateOrder(String orderName, OrderRequest order);
 
     /**
-     * Deletes an order by its unique identifier.
-     * @param orderId The unique identifier of the order to be deleted.
+     * Deletes an order by its unique name.
+     * @param orderName The unique name of the order to be deleted.
      * @return true if the order was successfully deleted, false if the order was not found.
      */
-    boolean deleteOrder(String orderId);
+    boolean deleteOrder(String orderName);
 }
