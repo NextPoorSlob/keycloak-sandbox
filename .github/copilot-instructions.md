@@ -39,7 +39,7 @@ Within `ecommerce-bff`, the app follows a conventional Spring MVC layout:
 - `common/` contains reusable API response and error-handling pieces.
 - `src/main/resources/application.properties` contains the app configuration.
 
-The API contract is intentionally consistent: controllers return `ResponseEntity<ApiResponseBody<T>>`, and the shared `GlobalExceptionHandler` converts `ResourceNotFoundException` into a JSON envelope shaped like `{ status, httpStatus, message, data }`.
+The order API uses standard REST representations and status codes: GET endpoints return order data directly with `200 OK`, POST returns the created order with `201 Created` and a `Location` header, and successful PUT/DELETE operations return `204 No Content`. The shared `GlobalExceptionHandler` converts `ResourceNotFoundException` into a JSON envelope shaped like `{ status, httpStatus, message, data }`; error responses therefore use this envelope while successful CRUD responses do not.
 
 ## Key conventions
 
